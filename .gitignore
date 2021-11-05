@@ -13,3 +13,4 @@ _deps
 deps/googletest/
 deps/jsoncpp/
 deps/libevent/
+.vscode/

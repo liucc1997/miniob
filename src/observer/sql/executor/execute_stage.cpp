@@ -134,7 +134,7 @@ void ExecuteStage::handle_request(common::StageEvent *event) {
     case SCF_UPDATE:
     case SCF_DELETE:
     case SCF_CREATE_TABLE:
-      LOG_INFO("<LCC> SCF_CREATE_TABLE\n");
+      printf("<LCC> SCF_CREATE_TABLE\n");
     case SCF_SHOW_TABLES:
     case SCF_DESC_TABLE:
     case SCF_DROP_TABLE:

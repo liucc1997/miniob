@@ -111,6 +111,32 @@ RC Table::create(const char *path, const char *name, const char *base_dir, int a
   return rc;
 }
 
+RC Table::drop(const char *path, const char *name, const char *base_dir) {
+  if (nullptr == name || common::is_blank(name)) {
+    LOG_WARN("Name cannot be empty");
+    return RC::INVALID_ARGUMENT;
+  }
+  LOG_INFO("Begin to drop table %s:%s", base_dir, name);
+  RC rc = RC::SUCCESS;
+  // 删除数据文件
+  int ret;
+  std::string data_file = std::string(base_dir) + "/" + name + TABLE_DATA_SUFFIX;
+  ret = remove(data_file.c_str());
+  if (ret != 0) {
+    LOG_ERROR("Failed to remove table data file");
+    return RC::IOERR;
+  }
+  // 删除元数据文件
+  ret = remove(path);
+  if (ret != 0) {
+    LOG_ERROR("Failed to remove table meta file");
+    return RC::IOERR;
+  }
+  LOG_INFO("Successfully drop table %s:%s", base_dir, name);
+  return rc;
+}
+
+
 RC Table::open(const char *meta_file, const char *base_dir) {
   // 加载元数据文件
   std::fstream fs;

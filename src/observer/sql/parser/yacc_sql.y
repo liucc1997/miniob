@@ -39,6 +39,7 @@ void yyerror(yyscan_t scanner, const char *str)
   ParserContext *context = (ParserContext *)(yyget_extra(scanner));
   query_reset(context->ssql);
   context->ssql->flag = SCF_ERROR;
+  context->ssql->sstr.errors = NULL;
   context->condition_length = 0;
   context->from_length = 0;
   context->select_length = 0;
