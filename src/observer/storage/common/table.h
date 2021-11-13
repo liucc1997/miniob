@@ -87,6 +87,7 @@ private:
 
   RC insert_record(Trx *trx, Record *record);
   RC delete_record(Trx *trx, Record *record);
+  RC update_record(Trx *trx, Record *record, const char* index_name, const char* new_data);
 
 private:
   friend class RecordUpdater;
@@ -94,12 +95,17 @@ private:
 
   RC insert_entry_of_indexes(const char *record, const RID &rid);
   RC delete_entry_of_indexes(const char *record, const RID &rid, bool error_on_not_exists);
+  RC update_entry_of_indexes(const char *index_name, const char *record, const RID *rid, const char *new_data);
+
+
 private:
   RC init_record_handler(const char *base_dir);
   RC make_record(int value_num, const Value *values, char * &record_out);
 
 private:
   Index *find_index(const char *index_name) const;
+  Index *find_index_by_field(const char *field_name) const;
+
 
 private:
   std::string             base_dir_;

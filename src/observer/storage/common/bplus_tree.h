@@ -84,6 +84,13 @@ public:
   RC delete_entry(const char *pkey, const RID *rid);
 
   /**
+   * 从IndexHandle句柄对应的索引中更新一个值为（*pData，rid）的索引项
+   * 参数pnew_Data指向新的属性值
+   * @return RECORD_INVALID_KEY 指定值不存在
+   */
+  RC update_entry(const char *data, const RID *rid, const char *new_data);
+
+  /**
    * 获取指定值的record
    * @param rid  返回值，记录记录所在的页面号和slot
    */

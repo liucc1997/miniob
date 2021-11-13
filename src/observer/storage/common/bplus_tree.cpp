@@ -1460,6 +1460,17 @@ RC BplusTreeHandler::delete_entry(const char *data, const RID *rid) {
   return SUCCESS;
 }
 
+RC BplusTreeHandler::update_entry(const char *data, const RID *rid, const char *new_data) {
+  // delete entry
+  RC rc = RC::SUCCESS;
+  rc = delete_entry(data, rid);
+  if (rc != RC::SUCCESS) {
+    LOG_ERROR("Failed to update entry when delting old entry. ");
+    return rc;
+  }
+  return insert_entry(new_data, rid);
+}
+
 
 RC BplusTreeHandler::print_tree() {
   BPPageHandle page_handle;
@@ -1543,7 +1554,27 @@ RC BplusTreeHandler::find_first_index_satisfied(CompOp compop, const char *key, 
     if(rc != SUCCESS){
       return rc;
     }
-    *rididx=0;
+    next = *page_num;
+    if(next > 0) {
+      rc = disk_buffer_pool_->get_this_page(file_id_, next, &page_handle);
+      if(rc != SUCCESS){
+        return rc;
+      }
+      rc = disk_buffer_pool_->get_data(&page_handle, &pdata);
+      if(rc != SUCCESS){
+        return rc;
+      }
+      node = get_index_node(pdata);
+      tmp = CompareKey(node->keys, key, file_header_.attr_type,file_header_.attr_length);
+      rc = disk_buffer_pool_->unpin_page(&page_handle);
+      if(rc != SUCCESS){
+        return rc;
+      }
+      if (tmp > 0) {
+        return RC::RECORD_EOF;
+      }
+    }
+    *rididx = 0;
     return SUCCESS;
   }
   rid.page_num = -1;
@@ -1578,7 +1609,21 @@ RC BplusTreeHandler::find_first_index_satisfied(CompOp compop, const char *key, 
     node = get_index_node(pdata);
     for(i = 0; i < node->key_num; i++){
       tmp=CompareKey(node->keys+i*file_header_.key_length,key,file_header_.attr_type,file_header_.attr_length);
-      if(compop == EQUAL_TO ||compop == GREAT_EQUAL){
+      if (compop == EQUAL_TO) {
+        if (tmp == 0) {
+          rc = disk_buffer_pool_->get_page_num(&page_handle, page_num);
+          if(rc != SUCCESS){
+            return rc;
+          }
+          *rididx=i;
+          rc = disk_buffer_pool_->unpin_page(&page_handle);
+          if(rc != SUCCESS){
+            return rc;
+          }
+          return SUCCESS;
+        }
+      }
+      if (compop == GREAT_EQUAL){
         if(tmp>=0){
           rc = disk_buffer_pool_->get_page_num(&page_handle, page_num);
           if(rc != SUCCESS){
@@ -1713,7 +1758,7 @@ RC BplusTreeScanner::next_entry(RID *rid) {
   if(!opened_){
     return RC::RECORD_CLOSED;
   }
-  rc = get_next_idx_in_memory(rid);//和RM中一样，有可能有错误，一次只查当前页和当前页的下一页，有待确定
+  rc = get_next_idx_in_memory(rid); //和RM中一样，有可能有错误，一次只查当前页和当前页的下一页，有待确定
   if(rc == RC::RECORD_NO_MORE_IDX_IN_MEM){
     rc = find_idx_pages();
     if(rc != SUCCESS){
@@ -1771,12 +1816,11 @@ RC BplusTreeScanner::get_next_idx_in_memory(RID *rid) {
   char *pdata;
   IndexNode *node;
   RC rc;
-  if(next_index_of_page_handle_ >= pinned_page_count_) {
-    return RC::RECORD_NO_MORE_IDX_IN_MEM;
-  }
-
   if(next_page_num_ == -1 && index_in_node_ == -1) {
     return RC::RECORD_EOF;
+  }
+  if(next_index_of_page_handle_ >= pinned_page_count_) {
+    return RC::RECORD_NO_MORE_IDX_IN_MEM;
   }
 
   for( ; next_index_of_page_handle_ < pinned_page_count_; next_index_of_page_handle_++){

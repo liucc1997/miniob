@@ -123,7 +123,6 @@ StageEvent *ParseStage::handle_request(StageEvent *event) {
   if (ret != RC::SUCCESS) {
     // set error information to event
     const char *error = result->sstr.errors != nullptr ? result->sstr.errors : "Unknown error";
-    printf("<LCC> error = %lx\n", error);
     char response[256];
     snprintf(response, sizeof(response), "Failed to parse sql: %s, error msg: %s\n", sql.c_str(), error);
     // snprintf(response, sizeof(response), "Failed to parse sql: %s, error msg: %s\n", sql.c_str(), "Unknown Error");

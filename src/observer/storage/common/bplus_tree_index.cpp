@@ -68,6 +68,10 @@ RC BplusTreeIndex::delete_entry(const char *record, const RID *rid) {
   return index_handler_.delete_entry(record + field_meta_.offset(), rid);
 }
 
+RC BplusTreeIndex::update_entry(const char *record, const RID *rid, const char *new_data) {
+  return index_handler_.update_entry(record + field_meta_.offset(), rid, new_data + field_meta_.offset());
+}
+
 IndexScanner *BplusTreeIndex::create_scanner(CompOp comp_op, const char *value) {
   BplusTreeScanner *bplus_tree_scanner = new BplusTreeScanner(index_handler_);
   RC rc = bplus_tree_scanner->open(comp_op, value);
