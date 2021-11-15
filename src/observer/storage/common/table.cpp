@@ -663,13 +663,13 @@ RC Table::update_entry_of_indexes(const char *attribute_name, const char *record
 RC Table::update_record(Trx *trx, const char *attribute_name, const Value *value, int condition_num, const Condition conditions[], int *updated_count) {
   // test
   // return RC::SUCCESS;
-  if (strncmp("aaa", attribute_name, 3) == 0) {
-    for (Index* index: indexes_) {
-      BplusTreeIndex *bindex = (BplusTreeIndex *)index;
-      bindex->get_index_handler_()->print_tree();
-    }
-    return RC::GENERIC_ERROR;
-  }
+  // if (strncmp("aaa", attribute_name, 3) == 0) {
+  //   for (Index* index: indexes_) {
+  //     BplusTreeIndex *bindex = (BplusTreeIndex *)index;
+  //     bindex->get_index_handler_()->print_tree();
+  //   }
+  //   return RC::GENERIC_ERROR;
+  // }
   // check whether the conditions is valid
   for (int i = 0; i < condition_num; i++) {
     char *condition_attribute_name;
@@ -696,7 +696,7 @@ RC Table::update_record(Trx *trx, const char *attribute_name, const Value *value
     return rc;
   }
   // Scan qualified records and save them in vector<Record>
-  rc = scan_record(trx, &filter, -1, &updater, record_reader_update_adapter);
+  // rc = scan_record(trx, &filter, -1, &updater, record_reader_update_adapter);
   if (rc != RC::SUCCESS) {
     return rc;
   }
