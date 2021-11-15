@@ -1554,26 +1554,26 @@ RC BplusTreeHandler::find_first_index_satisfied(CompOp compop, const char *key, 
     if(rc != SUCCESS){
       return rc;
     }
-    next = *page_num;
-    if(next > 0) {
-      rc = disk_buffer_pool_->get_this_page(file_id_, next, &page_handle);
-      if(rc != SUCCESS){
-        return rc;
-      }
-      rc = disk_buffer_pool_->get_data(&page_handle, &pdata);
-      if(rc != SUCCESS){
-        return rc;
-      }
-      node = get_index_node(pdata);
-      tmp = CompareKey(node->keys, key, file_header_.attr_type,file_header_.attr_length);
-      rc = disk_buffer_pool_->unpin_page(&page_handle);
-      if(rc != SUCCESS){
-        return rc;
-      }
-      if (tmp > 0) {
-        return RC::RECORD_EOF;
-      }
-    }
+    // next = *page_num;
+    // if(next > 0) {
+    //   rc = disk_buffer_pool_->get_this_page(file_id_, next, &page_handle);
+    //   if(rc != SUCCESS){
+    //     return rc;
+    //   }
+    //   rc = disk_buffer_pool_->get_data(&page_handle, &pdata);
+    //   if(rc != SUCCESS){
+    //     return rc;
+    //   }
+    //   node = get_index_node(pdata);
+    //   tmp = CompareKey(node->keys, key, file_header_.attr_type,file_header_.attr_length);
+    //   rc = disk_buffer_pool_->unpin_page(&page_handle);
+    //   if(rc != SUCCESS){
+    //     return rc;
+    //   }
+    //   if (tmp > 0) {
+    //     return RC::RECORD_EOF;
+    //   }
+    // }
     *rididx = 0;
     return SUCCESS;
   }
@@ -1609,21 +1609,22 @@ RC BplusTreeHandler::find_first_index_satisfied(CompOp compop, const char *key, 
     node = get_index_node(pdata);
     for(i = 0; i < node->key_num; i++){
       tmp=CompareKey(node->keys+i*file_header_.key_length,key,file_header_.attr_type,file_header_.attr_length);
-      if (compop == EQUAL_TO) {
-        if (tmp == 0) {
-          rc = disk_buffer_pool_->get_page_num(&page_handle, page_num);
-          if(rc != SUCCESS){
-            return rc;
-          }
-          *rididx=i;
-          rc = disk_buffer_pool_->unpin_page(&page_handle);
-          if(rc != SUCCESS){
-            return rc;
-          }
-          return SUCCESS;
-        }
-      }
-      if (compop == GREAT_EQUAL){
+      if(compop == EQUAL_TO ||compop == GREAT_EQUAL){
+      // if (compop == EQUAL_TO) {
+      //   if (tmp == 0) {
+      //     rc = disk_buffer_pool_->get_page_num(&page_handle, page_num);
+      //     if(rc != SUCCESS){
+      //       return rc;
+      //     }
+      //     *rididx=i;
+      //     rc = disk_buffer_pool_->unpin_page(&page_handle);
+      //     if(rc != SUCCESS){
+      //       return rc;
+      //     }
+      //     return SUCCESS;
+      //   }
+      // }
+      // if (compop == GREAT_EQUAL){
         if(tmp>=0){
           rc = disk_buffer_pool_->get_page_num(&page_handle, page_num);
           if(rc != SUCCESS){
