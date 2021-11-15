@@ -576,6 +576,7 @@ public:
   }
   RC add_record(Record* record) {
     // records_.push_back(*record);
+    return RC::SUCCESS;
   }
   RC do_update() {
     RC rc = RC::SUCCESS;
@@ -660,7 +661,7 @@ RC Table::update_entry_of_indexes(const char *attribute_name, const char *record
   return rc;
 }
 
-RC Table::update_record(Trx *trx, const char *attribute_name, const Value *value, int condition_num, const Condition conditions[], int *updated_count) {
+RC Table::update_record(Trx *trx, ConditionFilter *filter, const char *attribute_name, const Value *value, int *updated_count) {
   // test
   // return RC::SUCCESS;
   // if (strncmp("aaa", attribute_name, 3) == 0) {
@@ -671,32 +672,34 @@ RC Table::update_record(Trx *trx, const char *attribute_name, const Value *value
   //   return RC::GENERIC_ERROR;
   // }
   // check whether the conditions is valid
-  for (int i = 0; i < condition_num; i++) {
-    char *condition_attribute_name;
-    if (conditions[i].left_is_attr) {
-      condition_attribute_name = conditions[i].left_attr.attribute_name;
-    }
-    else {
-      condition_attribute_name = conditions[i].right_attr.attribute_name;
-    }
-    const FieldMeta *field_meta = table_meta_.field(condition_attribute_name);
-    if (nullptr == field_meta) {
-      LOG_WARN("No such field in conidtions. %s.%s", name(), condition_attribute_name);
-      return RC::SCHEMA_FIELD_MISSING;
-    }
-  }
+
+  // for (int i = 0; i < condition_num; i++) {
+  //   char *condition_attribute_name;
+  //   if (conditions[i].left_is_attr) {
+  //     condition_attribute_name = conditions[i].left_attr.attribute_name;
+  //   }
+  //   else {
+  //     condition_attribute_name = conditions[i].right_attr.attribute_name;
+  //   }
+  //   const FieldMeta *field_meta = table_meta_.field(condition_attribute_name);
+  //   if (nullptr == field_meta) {
+  //     LOG_WARN("No such field in conidtions. %s.%s", name(), condition_attribute_name);
+  //     return RC::SCHEMA_FIELD_MISSING;
+  //   }
+  // }
+  // filter.init(*this, conditions, condition_num);
 
   RC rc = RC::SUCCESS;
-  CompositeConditionFilter filter;
-  filter.init(*this, conditions, condition_num);
-  
+  if (value == NULL) {
+    return RC::GENERIC_ERROR;
+  }
   RecordUpdater updater(*this, trx, attribute_name, *value);
   rc = updater.init();
   if (rc != RC::SUCCESS) {
     return rc;
   }
   // Scan qualified records and save them in vector<Record>
-  rc = scan_record(trx, &filter, -1, &updater, record_reader_update_adapter);
+  rc = scan_record(trx, filter, -1, &updater, record_reader_update_adapter);
   if (rc != RC::SUCCESS) {
     return rc;
   }
