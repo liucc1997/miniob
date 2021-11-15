@@ -700,7 +700,7 @@ RC Table::update_record(Trx *trx, const char *attribute_name, const Value *value
   if (rc != RC::SUCCESS) {
     return rc;
   }
-  rc = updater.do_update();
+  // rc = updater.do_update();
   if (updated_count != nullptr) {
     *updated_count = updater.updated_count();
   }
