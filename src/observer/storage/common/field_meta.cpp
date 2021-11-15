@@ -27,11 +27,12 @@ const char *ATTR_TYPE_NAME[] = {
   "undefined",
   "chars",
   "ints",
-  "floats"
+  "floats",
+  "dates"
 };
 
 const char *attr_type_to_string(AttrType type) {
-  if (type >= UNDEFINED && type <= FLOATS) {
+  if (type >= 0 && type < sizeof(ATTR_TYPE_NAME) / sizeof(char *)) {
     return ATTR_TYPE_NAME[type];
   }
   return "unknown";
