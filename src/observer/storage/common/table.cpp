@@ -571,6 +571,7 @@ public:
       }
       return RC::MISMATCH;
     }
+    attr_data_size_ = field_meta_->len();
     return RC::SUCCESS;
   }
   RC add_record(Record* record) {
@@ -580,28 +581,16 @@ public:
     RC rc = RC::SUCCESS;
     int record_size = table_.table_meta().record_size();
     char *new_record_data = new char[record_size];
-    int record_data_size = 0;
-    switch (field_meta_->type()) {
-      case INTS: {
-        record_data_size = sizeof(int);
-      }
-      break;
-      case FLOATS: {
-        record_data_size = sizeof(float);
-      }
-        break;
-      case CHARS: {
-        // The length of the string before and after modification is different
-        record_data_size = strlen((char*)value_.data);
-        if (record_data_size < 4) {
-          record_data_size += 1;
-        }
-      }
-      break;
-    } 
     int i = 0;
     for (Record &record : records_) {
       // create new record->data
+      int record_data_size = attr_data_size_;
+      if (field_meta_->type() == CHARS) {
+        record_data_size = strlen((char *)value_.data) + 1;
+        if (record_data_size > attr_data_size_) {
+          record_data_size = attr_data_size_;
+        }
+      }
       memcpy(new_record_data, record.data, record_size);
       memcpy(new_record_data + field_meta_->offset(), value_.data, record_data_size);
       rc = table_.update_record(trx_, &record, attribute_name_, new_record_data);
@@ -634,6 +623,7 @@ private:
   Value value_;
   const FieldMeta *field_meta_;
   int updated_count_ = 0;
+  int attr_data_size_ = 0;
   std::vector<Record> records_;
 };
 static RC record_reader_update_adapter(Record *record, void *context) {
