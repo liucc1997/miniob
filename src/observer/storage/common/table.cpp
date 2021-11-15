@@ -575,7 +575,7 @@ public:
     return RC::SUCCESS;
   }
   RC add_record(Record* record) {
-    records_.push_back(*record);
+    // records_.push_back(*record);
   }
   RC do_update() {
     RC rc = RC::SUCCESS;
