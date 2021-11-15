@@ -575,7 +575,7 @@ public:
     return RC::SUCCESS;
   }
   RC add_record(Record* record) {
-    // records_.push_back(*record);
+    records_.push_back(*record);
     return RC::SUCCESS;
   }
   RC do_update() {
@@ -594,21 +594,21 @@ public:
       }
       memcpy(new_record_data, record.data, record_size);
       memcpy(new_record_data + field_meta_->offset(), value_.data, record_data_size);
-      // rc = table_.update_record(trx_, &record, attribute_name_, new_record_data);
+      rc = table_.update_record(trx_, &record, attribute_name_, new_record_data);
       
-      rc = table_.delete_record(trx_, &record);
-      if (rc != RC::SUCCESS) {
-        LOG_ERROR("update filed when deleting.\n");
-        continue;
-      }
-      record.data = new_record_data;
-      rc = table_.insert_record(trx_, &record);
-      if (rc == RC::SUCCESS) {
-        updated_count_++;
-      }
-      else {
-        LOG_ERROR("update filed when inserting.\n");
-      }
+      // rc = table_.delete_record(trx_, &record);
+      // if (rc != RC::SUCCESS) {
+      //   LOG_ERROR("update filed when deleting.\n");
+      //   continue;
+      // }
+      // record.data = new_record_data;
+      // rc = table_.insert_record(trx_, &record);
+      // if (rc == RC::SUCCESS) {
+      //   updated_count_++;
+      // }
+      // else {
+      //   LOG_ERROR("update filed when inserting.\n");
+      // }
     }
     delete[] new_record_data;
     return RC::SUCCESS;
@@ -703,7 +703,7 @@ RC Table::update_record(Trx *trx, ConditionFilter *filter, const char *attribute
   if (rc != RC::SUCCESS) {
     return rc;
   }
-  // rc = updater.do_update();
+  rc = updater.do_update();
   if (updated_count != nullptr) {
     *updated_count = updater.updated_count();
   }
