@@ -661,7 +661,7 @@ RC Table::update_entry_of_indexes(const char *attribute_name, const char *record
 
 RC Table::update_record(Trx *trx, const char *attribute_name, const Value *value, int condition_num, const Condition conditions[], int *updated_count) {
   // test
-  return RC::SUCCESS;
+  // return RC::SUCCESS;
   if (strncmp("aaa", attribute_name, 3) == 0) {
     for (Index* index: indexes_) {
       BplusTreeIndex *bindex = (BplusTreeIndex *)index;
