@@ -14,6 +14,7 @@ See the Mulan PSL v2 for more details. */
 
 #include "sql/executor/tuple.h"
 #include "storage/common/table.h"
+#include "storage/common/date.h"
 #include "common/log/log.h"
 
 Tuple::Tuple(const Tuple &other) {
@@ -232,6 +233,14 @@ void TupleRecordConverter::add_record(const char *record) {
       case CHARS: {
         const char *s = record + field_meta->offset();  // 现在当做Cstring来处理
         tuple.add(s, strlen(s));
+      }
+      break;
+      case DATES: {
+        int value = *(int*)(record + field_meta->offset());
+        Date d(value);
+        if (d.to_string()) {
+          tuple.add(d.to_string(), DATA_STRING_LEN);
+        }
       }
       break;
       default: {

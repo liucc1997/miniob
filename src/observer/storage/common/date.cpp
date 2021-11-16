@@ -1,15 +1,8 @@
 #include "date.h"
 #include <stdio.h>
-#define is_leapyear(years) ((years % 100 != 0 && years % 4 == 0) || (years % 100 == 0 && years % 400 == 0))
-#define INVALID_DATE -1
-
-static const int MONTH_DAYS[] =           {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-static const int MONTH_DAYS_LEAP[] =      {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-static const int MONTH_DAYS_ACCU[] =      {0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
-static const int MONTH_DAYS_LEAP_ACCU[] = {0, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335};
 
 bool date_valid(int years, int months, int days) {
-    if (years <= 0) false;
+    if (years <= 0) return false;
     if (months <= 0 || months > 12) return false;
     if (days <= 0 || days > MONTH_DAYS_LEAP[months]) return false;
     if (!is_leapyear(years) && months == 2 && days > 28) {
@@ -60,7 +53,7 @@ int inttdate(int value, int& years, int& months, int& days) {
     //     if (is_leapyear(years)) value = value + 366;
     //     else value = value + 365;
     // }
-    printf("years = %d\n", years);
+    // printf("years = %d\n", years);
     const int* month_days = NULL;
     if (is_leapyear(years)) {
         month_days = MONTH_DAYS_LEAP;
@@ -79,11 +72,54 @@ int inttdate(int value, int& years, int& months, int& days) {
     return 0;
 }
 
-Date::Date(int date_value): date_value_(date_value) {
-    date_string_ = new char[12];
-    // int years, month, days;
-    // year = 
+int charstdate(const char *s, int& years, int& months, int& days) {
+    int a[3] = {0, 0, 0};
+    int p = 0;
+    int temp = 0;
+    for (int i = 0; s[i] != '\0'; i++) {
+        if (s[i] == ' ') continue;
+        if (s[i] == '-') {
+            if (p >= 2) {
+                return INVALID_DATE;
+            }
+            a[p++] = temp;
+            temp = 0;
+            continue;
+        }
+        if (s[i] >= '0' && s[i] <= '9') {
+            temp = temp * 10 + s[i] - '0';
+            continue;
+        }
+        return INVALID_DATE;
+    }
+    a[p] = temp;
+    // printf("DATE TEST: a = {%d, %d, %d}\n", a[0], a[1], a[2]);
+    if (!date_valid(a[0], a[1], a[2])) {
+        return INVALID_DATE;
+    }
+    years = a[0];
+    months = a[1];
+    days = a[2];
+    return 0;
 }
-Date::Date(int years, int months, int days) {
 
+Date::Date(int date_value): date_value_(date_value) {}
+Date::Date(int years, int months, int days) {
+    date_value_ = datetint(years, months, days);
+}
+Date::Date(const char *date_string) {
+    int y = 0, m = 0, d = 0;
+    charstdate(date_string, y, m, d);
+    date_value_ = datetint(y, m, d);
+}
+bool Date::isvalid() {
+    return date_value_ >= 0;
+}
+char *Date::to_string() {
+    int y, m, d;
+    if (inttdate(date_value_, y, m, d) == INVALID_DATE) {
+        return nullptr;
+    }
+    sprintf(date_string_, "%04d-%02d-%02d", y, m, d);
+    return date_string_;
 }
