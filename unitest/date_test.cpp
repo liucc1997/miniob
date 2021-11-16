@@ -85,6 +85,14 @@ TEST(test_date, date_class) {
   ASSERT_EQ(d6.date_value_, INVALID_DATE);
   ASSERT_STREQ(d6.to_string(), nullptr);
 
+  char* s11 = "2019-12-20"; 
+  char* s12 = "2019-12-21"; 
+  Date d11(s11);
+  Date d12(s12);
+  printf("<LCC> %s %d %s\n", s11, d11.date_value_, d11.to_string());
+  printf("<LCC> %s %d %s\n", s12, d12.date_value_, d12.to_string());
+  ASSERT_STREQ(d11.to_string(), s11);
+
 }
 int main(int argc, char **argv) {
 

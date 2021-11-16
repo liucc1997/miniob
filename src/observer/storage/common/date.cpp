@@ -61,7 +61,7 @@ int inttdate(int value, int& years, int& months, int& days) {
     else {
         month_days = MONTH_DAYS;
     }
-    for (int i = 1; i < 12; i++) {
+    for (int i = 1; i <= 12; i++) {
         if (value - month_days[i] <= 0) {
             months = i;
             break;
