@@ -109,27 +109,27 @@ int TupleSchema::index_of_field(const char *table_name, const char *field_name) 
   return -1;
 }
 
-void TupleSchema::print(std::ostream &os) const {
+void TupleSchema::print(std::ostream &os, int multi_table) const {
   if (fields_.empty()) {
     os << "No schema";
     return;
   }
 
   // 判断有多张表还是只有一张表
-  std::set<std::string> table_names;
-  for (const auto &field: fields_) {
-    table_names.insert(field.table_name());
-  }
+  // std::set<std::string> table_names;
+  // for (const auto &field: fields_) {
+  //   table_names.insert(field.table_name());
+  // }
 
   for (std::vector<TupleField>::const_iterator iter = fields_.begin(), end = --fields_.end();
        iter != end; ++iter) {
-    if (table_names.size() > 1) {
+    if (multi_table) {
       os << iter->table_name() << ".";
     }
     os << iter->field_name() << " | ";
   }
 
-  if (table_names.size() > 1) {
+  if (multi_table) {
     os << fields_.back().table_name() << ".";
   }
   os << fields_.back().field_name() << std::endl;
@@ -171,7 +171,6 @@ void TupleSet::join(const TupleSet& t1, const TupleSet& t2, const std::vector<Co
   }
   set_schema(schema);
 
-  int count = 0;
   for (const Tuple& tuple1 : t1.tuples()) {
     for (const Tuple& tuple2: t2.tuples()) {
       // filter
@@ -260,13 +259,13 @@ void TupleSet::clear() {
   schema_.clear();
 }
 
-void TupleSet::print(std::ostream &os) const {
+void TupleSet::print(std::ostream &os, int multi_table) const {
   if (schema_.fields().empty()) {
     LOG_WARN("Got empty schema");
     return;
   }
 
-  schema_.print(os);
+  schema_.print(os, multi_table);
 
   for (const Tuple &item : tuples_) {
     const std::vector<std::shared_ptr<TupleValue>> &values = item.values();

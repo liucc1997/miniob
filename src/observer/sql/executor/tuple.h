@@ -106,12 +106,15 @@ public:
   void clear() {
     fields_.clear();
   }
+  void set_table_count(int c) {table_count_ = c;}
+  int table_count() {return table_count_;}
 
-  void print(std::ostream &os) const;
+  void print(std::ostream &os, int multi_table = 0) const;
 public:
   static void from_table(const Table *table, TupleSchema &schema);
 private:
   std::vector<TupleField> fields_;
+  int table_count_ = 0;
 };
 
 class TupleSet {
@@ -138,7 +141,7 @@ public:
   const Tuple &get(int index) const;
   const std::vector<Tuple> &tuples() const;
 
-  void print(std::ostream &os) const;
+  void print(std::ostream &os, int multi_table = 0) const;
 public:
   const TupleSchema &schema() const {
     return schema_;

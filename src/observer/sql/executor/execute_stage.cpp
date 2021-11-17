@@ -314,7 +314,8 @@ RC ExecuteStage::do_select(const char *db, Query *sql, SessionEvent *session_eve
         temp.join(mutiset, tuple_sets[i], join_conditions);
         std::swap(mutiset, temp);
       }
-      mutiset.print(ss);
+      // 参数1用于决定schema是多表table.attr的显示
+      mutiset.print(ss, 1);
     }
   } else {
     // 当前只查询一张表，直接返回结果即可
