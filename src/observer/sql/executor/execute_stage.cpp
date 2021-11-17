@@ -307,10 +307,11 @@ RC ExecuteStage::do_select(const char *db, Query *sql, SessionEvent *session_eve
     }
     if (join_conditions_valid) {
       // 多表连接
-      TupleSet mutiset(std::move(tuple_sets.front()));
-      for (std::vector<TupleSet>::const_iterator iter = tuple_sets.begin() + 1; iter != tuple_sets.end(); iter++) {
+      TupleSet mutiset(std::move(tuple_sets.back()));
+      //for (std::vector<TupleSet>::const_iterator iter = tuple_sets.begin() + 1; iter != tuple_sets.end(); iter++) {
+      for (int i = tuple_sets.size() - 2; i >= 0; i--) {
         TupleSet temp;
-        temp.join(mutiset, *iter, join_conditions);
+        temp.join(mutiset, tuple_sets[i], join_conditions);
         std::swap(mutiset, temp);
       }
       mutiset.print(ss);
