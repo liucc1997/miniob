@@ -129,6 +129,7 @@ public:
   const TupleSchema &get_schema() const;
 
   void add(Tuple && tuple);
+  void join(const TupleSet& t1, const TupleSet& t2, const std::vector<Condition>& conditions);
 
   void clear();
 

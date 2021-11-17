@@ -158,6 +158,103 @@ void TupleSet::add(Tuple &&tuple) {
   tuples_.emplace_back(std::move(tuple));
 }
 
+void TupleSet::join(const TupleSet& t1, const TupleSet& t2, const std::vector<Condition>& conditions) {
+  // 设置join表的属性
+  TupleSchema schema;
+  TupleSchema s1 = t1.get_schema();
+  TupleSchema s2 = t2.get_schema();
+  for (TupleField schema_item: s1.fields()) {
+    schema.add_if_not_exists(schema_item.type(), schema_item.table_name(), schema_item.field_name());
+  }
+  for (TupleField schema_item: s2.fields()) {
+    schema.add_if_not_exists(schema_item.type(), schema_item.table_name(), schema_item.field_name());
+  }
+  set_schema(schema);
+
+  int count = 0;
+  for (const Tuple& tuple1 : t1.tuples()) {
+    for (const Tuple& tuple2: t2.tuples()) {
+      // filter
+      bool fillter_ret = true;
+      for (const Condition& condition: conditions) {
+        const RelAttr left = condition.left_attr;
+        const RelAttr right = condition.right_attr;
+        const TupleValue *leftv, *rightv;
+        int left_index, right_index;
+        left_index = s1.index_of_field(left.relation_name, left.attribute_name);
+        if (left_index >= 0) {
+          leftv = &tuple1.get(left_index);
+        }
+        else {
+          left_index = s2.index_of_field(left.relation_name, left.attribute_name);
+          if (left_index < 0) {
+            // LOG_ERROR("Failed to find index of left field(%s.%s) in turple.", left.relation_name, left.attribute_name);
+            printf("Failed to find index of left field(%s.%s) in turple.\n", left.relation_name, left.attribute_name);
+            continue;
+          }
+          leftv = &tuple2.get(left_index);
+        }
+
+        right_index = s1.index_of_field(right.relation_name, right.attribute_name);
+        if (right_index >= 0) {
+          rightv = &tuple1.get(right_index);
+        }
+        else {
+          right_index = s2.index_of_field(right.relation_name, right.attribute_name);
+          if (right_index < 0) {
+            // LOG_ERROR("Failed to find index of left field(%s.%s) in turple.", right.relation_name, right.attribute_name);
+            printf("Failed to find index of left field(%s.%s) in turple.\n", right.relation_name, right.attribute_name);
+            continue;
+          }
+          rightv = &tuple2.get(right_index);
+        }
+        // TODO: 多表查询中不支持不同类型的比较
+        // if (s1.field(left_index).type() != ) {
+        //   printf("Failed %s.%s and  %s.%s has different type.", left.relation_name, left.attribute_name, \
+        //     right.relation_name, right.attribute_name);
+        //   return;
+        // }
+        int compare_result = leftv->compare(*rightv);
+        if (condition.comp == EQUAL_TO && compare_result == 0) {
+          continue;
+        }
+        if (condition.comp == LESS_EQUAL && compare_result <= 0) {
+          continue;
+        }
+        if (condition.comp == NOT_EQUAL && compare_result != 0) {
+          continue;
+        }         
+        if (condition.comp == LESS_THAN && compare_result < 0) {
+          continue;
+        }
+        if (condition.comp == GREAT_EQUAL && compare_result >= 0) {
+          continue;
+        }
+        if (condition.comp == GREAT_THAN && compare_result > 0) {
+          continue;
+        }
+        // 不满足条件
+        fillter_ret = false;
+        break;
+      }
+      if (fillter_ret) {
+        // genrate new tuple
+        Tuple tuple_new;
+        for (int i = 0; i < tuple1.size(); i++) {
+          tuple_new.add(tuple1.get_pointer(i));
+        }
+        for (int i = 0; i < tuple2.size(); i++) {
+          tuple_new.add(tuple2.get_pointer(i));
+        }
+        // add new tuple to TupleSet
+        this->add(std::move(tuple_new));
+      }
+    }
+  }
+  return;
+}
+
+
 void TupleSet::clear() {
   tuples_.clear();
   schema_.clear();

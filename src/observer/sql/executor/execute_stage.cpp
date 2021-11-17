@@ -264,6 +264,57 @@ RC ExecuteStage::do_select(const char *db, Query *sql, SessionEvent *session_eve
   std::stringstream ss;
   if (tuple_sets.size() > 1) {
     // 本次查询了多张表，需要做join操作
+    // 找出与两表join相关的过滤条件
+    std::vector<Condition> join_conditions;
+    bool join_conditions_valid = true;
+    for (size_t i = 0; i < selects.condition_num; i++) {
+      const Condition condition = selects.conditions[i];
+      // 多表查询情况下where字句的attr元数据校验
+      // 表不存在或者属性不存在的情况
+      Table *left_table = nullptr, *right_table = nullptr;
+      if (condition.left_is_attr == 1) {
+          left_table = DefaultHandler::get_default().find_table(db, condition.left_attr.relation_name);
+          if (left_table == nullptr || left_table->table_meta().field(condition.left_attr.attribute_name) == nullptr) {
+            LOG_ERROR("No such field in condition. %s.%s", condition.left_attr.relation_name, condition.left_attr.attribute_name);
+            join_conditions_valid = false;
+            rc = RC::SCHEMA_FIELD_MISSING;;
+            break;
+          }
+      }
+      if (condition.right_is_attr == 1) {
+        right_table = DefaultHandler::get_default().find_table(db, condition.right_attr.relation_name);
+        if (right_table == nullptr || right_table->table_meta().field(condition.right_attr.attribute_name) == nullptr) {
+          LOG_ERROR("No such field in condition. %s.%s", condition.right_attr.relation_name, condition.right_attr.attribute_name);
+          join_conditions_valid = false;
+          rc = RC::SCHEMA_FIELD_MISSING;;
+          break;
+        }
+      }
+      // 多表查询中只使用左右值是不同表属性名的condition
+      if ( left_table && right_table && strcmp(condition.left_attr.relation_name, condition.right_attr.relation_name)) {
+        const FieldMeta* left_feild = left_table->table_meta().field(condition.left_attr.attribute_name);
+        const FieldMeta* right_feild = right_table->table_meta().field(condition.right_attr.attribute_name);
+        // 左右的属性类型不一致
+        if (left_feild->type() != right_feild->type()) {
+          LOG_ERROR("Failed to parse conditions: %s.%s and %s.%s have different type.", condition.left_attr.relation_name, condition.left_attr.attribute_name, 
+            condition.right_attr.relation_name, condition.right_attr.attribute_name);
+          join_conditions_valid = false;
+          rc = RC::SCHEMA_FIELD_TYPE_MISMATCH;
+          break;
+        }
+        join_conditions.push_back(condition);
+      }
+    }
+    if (join_conditions_valid) {
+      // 多表连接
+      TupleSet mutiset(std::move(tuple_sets.front()));
+      for (std::vector<TupleSet>::const_iterator iter = tuple_sets.begin() + 1; iter != tuple_sets.end(); iter++) {
+        TupleSet temp;
+        temp.join(mutiset, *iter, join_conditions);
+        std::swap(mutiset, temp);
+      }
+      mutiset.print(ss);
+    }
   } else {
     // 当前只查询一张表，直接返回结果即可
     tuple_sets.front().print(ss);
