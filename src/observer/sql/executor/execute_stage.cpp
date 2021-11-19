@@ -404,15 +404,15 @@ RC create_selection_executor(Trx *trx, const Selects &selects, const char *db, c
 
   // 找出此表的聚合查询
   CompositeAggregate* aggr_list = new CompositeAggregate();
-  // for (int i = selects.aggregation_num - 1; i >= 0; i--) {
-  //   Aggregate* a = Aggregate::aggregate_allocator(table, selects.aggregation[i], selects.agg_attrs[i]);
-  //   if (a == nullptr) {
-  //     printf("Failed to call aggregate_allocator\n");
-  //     return RC::GENERIC_ERROR;
-  //   }
-  //   aggr_list->add_aggration(a);
-  // }
-  // select_node.set_aggregations(aggr_list);
+  for (int i = selects.aggregation_num - 1; i >= 0; i--) {
+    Aggregate* a = Aggregate::aggregate_allocator(table, selects.aggregation[i], selects.agg_attrs[i]);
+    if (a == nullptr) {
+      printf("Failed to call aggregate_allocator\n");
+      return RC::GENERIC_ERROR;
+    }
+    aggr_list->add_aggration(a);
+  }
+  select_node.set_aggregations(aggr_list);
   
   return select_node.init(trx, table, std::move(schema), std::move(condition_filters));
 }
