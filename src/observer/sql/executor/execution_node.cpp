@@ -24,10 +24,10 @@ SelectExeNode::~SelectExeNode() {
     delete filter;
   }
   condition_filters_.clear();
-  // if (aggregations_) {
-  //   printf("<LCC> ~SelectExeNode() delete aggregations_\n");
-  //   delete aggregations_;
-  // }
+  if (aggregations_) {
+    printf("<LCC> ~SelectExeNode() delete aggregations_\n");
+    delete aggregations_;
+  }
 }
 
 RC
@@ -40,6 +40,7 @@ SelectExeNode::init(Trx *trx, Table *table, TupleSchema &&tuple_schema, std::vec
 }
 RC SelectExeNode::set_aggregations(CompositeAggregate* aggregations) {
   aggregations_ = aggregations;
+  return RC::SUCCESS;
 }
 
 
