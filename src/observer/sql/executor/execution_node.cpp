@@ -25,6 +25,7 @@ SelectExeNode::~SelectExeNode() {
   }
   condition_filters_.clear();
   if (aggregations_) {
+    printf("<LCC> ~SelectExeNode() delete aggregations_\n");
     delete aggregations_;
   }
 }

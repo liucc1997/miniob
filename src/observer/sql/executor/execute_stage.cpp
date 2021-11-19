@@ -412,7 +412,7 @@ RC create_selection_executor(Trx *trx, const Selects &selects, const char *db, c
   //   }
   //   aggr_list->add_aggration(a);
   // }
-  select_node.set_aggregations(aggr_list);
+  // select_node.set_aggregations(aggr_list);
   
   return select_node.init(trx, table, std::move(schema), std::move(condition_filters));
 }
