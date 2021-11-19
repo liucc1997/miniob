@@ -85,6 +85,10 @@ ParserContext *get_context(yyscan_t scanner)
         STRING_T
         FLOAT_T
 		DATE_T
+		MAX
+		MIN
+		AVG
+		COUNT
         HELP
         EXIT
         DOT //QUOTE
@@ -359,6 +363,16 @@ select:				/*  select 语句的语法解析树*/
 			CONTEXT->select_length=0;
 			CONTEXT->value_length = 0;
 	}
+	| SELECT aggregate FROM ID rel_list where SEMICOLON 
+		{
+			selects_append_relation(&CONTEXT->ssql->sstr.selection, $4);
+			selects_append_conditions(&CONTEXT->ssql->sstr.selection, CONTEXT->conditions, CONTEXT->condition_length);
+			CONTEXT->ssql->flag=SCF_SELECT; //"select";
+			CONTEXT->condition_length=0;
+			CONTEXT->from_length=0;
+			CONTEXT->select_length=0;
+			CONTEXT->value_length = 0;
+	}
 	;
 
 select_attr:
@@ -405,7 +419,47 @@ attr_list:
         // CONTEXT->ssql->sstr.selection.attributes[CONTEXT->select_length++].relation_name=$2;
   	  }
   	;
-
+aggregate:
+	MAX LBRACE ID RBRACE aggregate_list {
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMAX, $3);
+	}
+    | MIN LBRACE ID RBRACE aggregate_list {
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMIN, $3);
+	}
+    | count_aggregate aggregate_list {
+	}
+    | AVG LBRACE ID RBRACE aggregate_list {
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGAVG, $3);
+	}
+    ;
+aggregate_list:
+    /* empty */
+    | COMMA MAX LBRACE ID RBRACE aggregate_list {
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMAX, $4);
+	}
+    | COMMA MIN LBRACE ID RBRACE aggregate_list {
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMIN, $4);
+	}
+    | COMMA count_aggregate aggregate_list {
+	}
+    | COMMA AVG LBRACE ID RBRACE aggregate_list {
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGAVG, $4);
+	}
+    ;
+count_aggregate:
+	COUNT LBRACE ID RBRACE { 
+		// count(feild_name)
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGCOUNT, $3);
+	}
+	| COUNT LBRACE STAR RBRACE { 
+		// count(*)
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGCOUNT, "*");
+	}
+	| COUNT LBRACE RBRACE { 
+		// count()
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGCOUNT, "");
+	}
+	;
 rel_list:
     /* empty */
     | COMMA ID rel_list {	

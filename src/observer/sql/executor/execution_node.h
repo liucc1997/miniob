@@ -17,7 +17,8 @@ See the Mulan PSL v2 for more details. */
 
 #include <vector>
 #include "storage/common/condition_filter.h"
-#include "sql/executor/tuple.h"
+#include "sql/executor/aggregate.h"
+// #include "sql/executor/tuple.h"
 
 class Table;
 class Trx;
@@ -36,12 +37,14 @@ public:
   virtual ~SelectExeNode();
 
   RC init(Trx *trx, Table *table, TupleSchema && tuple_schema, std::vector<DefaultConditionFilter *> &&condition_filters);
+  RC set_aggregations(CompositeAggregate* aggregations);
 
   RC execute(TupleSet &tuple_set) override;
 private:
   Trx *trx_ = nullptr;
   Table  * table_;
   TupleSchema  tuple_schema_;
+  CompositeAggregate* aggregations_;
   std::vector<DefaultConditionFilter *> condition_filters_;
 };
 

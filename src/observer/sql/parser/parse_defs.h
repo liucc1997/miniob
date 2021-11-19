@@ -60,14 +60,27 @@ typedef struct _Condition {
   Value right_value;   // right-hand side value if right_is_attr = FALSE
 } Condition;
 
+// 聚合运算
+typedef enum  {
+  UNKNOW_AGTYPE,
+  AGMAX,
+  AGMIN,
+  AGCOUNT,
+  AGAVG,
+  AGSUM
+} AggregationType;
+
 // struct of select
 typedef struct {
-  size_t    attr_num;               // Length of attrs in Select clause
-  RelAttr   attributes[MAX_NUM];    // attrs in Select clause
-  size_t    relation_num;           // Length of relations in Fro clause
-  char *    relations[MAX_NUM];     // relations in From clause
-  size_t    condition_num;          // Length of conditions in Where clause
-  Condition conditions[MAX_NUM];    // conditions in Where clause
+  size_t      attr_num;               // Length of attrs in Select clause
+  RelAttr     attributes[MAX_NUM];    // attrs in Select clause
+  size_t      relation_num;           // Length of relations in Fro clause
+  char *      relations[MAX_NUM];     // relations in From clause
+  size_t      condition_num;          // Length of conditions in Where clause
+  Condition   conditions[MAX_NUM];    // conditions in Where clause
+  size_t      aggregation_num;        // Length if aggregation in Select clause
+  AggregationType aggregation[MAX_NUM];   // Aggregation in Select clause
+  char *      agg_attrs[MAX_NUM];     // Aggregation attributes in Select clause
 } Selects;
 
 // struct of insert
@@ -197,6 +210,7 @@ void selects_init(Selects *selects, ...);
 void selects_append_attribute(Selects *selects, RelAttr *rel_attr);
 void selects_append_relation(Selects *selects, const char *relation_name);
 void selects_append_conditions(Selects *selects, Condition conditions[], size_t condition_num);
+void selects_append_aggregation(Selects *selects, AggregationType type, const char *aggregation_name);
 void selects_destroy(Selects *selects);
 
 void inserts_init(Inserts *inserts, const char *relation_name, Value values[], size_t value_num);

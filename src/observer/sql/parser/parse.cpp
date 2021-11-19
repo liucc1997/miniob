@@ -117,6 +117,11 @@ void selects_append_attribute(Selects *selects, RelAttr *rel_attr) {
 void selects_append_relation(Selects *selects, const char *relation_name) {
   selects->relations[selects->relation_num++] = strdup(relation_name);
 }
+void selects_append_aggregation(Selects *selects, AggregationType type, const char *aggregation_name) {
+  selects->agg_attrs[selects->aggregation_num] = strdup(aggregation_name);
+  selects->aggregation[selects->aggregation_num] = type;
+  selects->aggregation_num++;
+}
 
 void selects_append_conditions(Selects *selects, Condition conditions[], size_t condition_num) {
   assert(condition_num <= sizeof(selects->conditions)/sizeof(selects->conditions[0]));
