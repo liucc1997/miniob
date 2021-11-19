@@ -24,10 +24,10 @@ SelectExeNode::~SelectExeNode() {
     delete filter;
   }
   condition_filters_.clear();
-  if (aggregations_) {
-    printf("<LCC> ~SelectExeNode() delete aggregations_\n");
-    delete aggregations_;
-  }
+  // if (aggregations_) {
+  //   printf("<LCC> ~SelectExeNode() delete aggregations_\n");
+  //   delete aggregations_;
+  // }
 }
 
 RC
