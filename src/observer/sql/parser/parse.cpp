@@ -147,6 +147,12 @@ void selects_destroy(Selects *selects) {
     condition_destroy(&selects->conditions[i]);
   }
   selects->condition_num = 0;
+
+  for (size_t i = 0; i < selects->aggregation_num; i++) {
+    free(selects->agg_attrs[i]);
+    selects->agg_attrs[i] = NULL;
+  }
+  selects->aggregation_num = 0;
 }
 
 void inserts_init(Inserts *inserts, const char *relation_name, Value values[], size_t value_num) {

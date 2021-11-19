@@ -9,6 +9,11 @@ class Aggregate {
         Aggregate *converter = (Aggregate *)context;
         converter->do_record(data);
     }
+    static RC record_reader_ret(Record *record, void *context) {
+        Aggregate *converter = (Aggregate *)context;
+        converter->do_record((char*)record);
+        return RC::SUCCESS;
+    }
     Aggregate(AggregationType type, const char* attr_name) : aggr_type_(type), attr_name_(attr_name), feild_type_(UNDEFINED) {}
     virtual void do_record(const char *record) = 0;
     virtual const char* get_result_poniter() {

@@ -57,6 +57,7 @@ RC SelectExeNode::execute(TupleSet &tuple_set) {
     //    agg_schema.add(a->get_attr_type(), table_->name(), a->get_schema_attr());
     // }
     // tuple_set.set_schema(agg_schema);
+    // RC rc = table_->scan_record(trx_, &condition_filter, -1, (void *)aggregations_, Aggregate::record_reader);
     RC rc = table_->scan_record(trx_, &condition_filter, -1, (void *)aggregations_, Aggregate::record_reader);
     if (rc != RC::SUCCESS) {
       return rc;
