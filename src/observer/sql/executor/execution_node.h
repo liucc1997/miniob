@@ -44,7 +44,7 @@ private:
   Trx *trx_ = nullptr;
   Table  * table_;
   TupleSchema  tuple_schema_;
-  CompositeAggregate* aggregations_;
+  CompositeAggregate* aggregations_ = nullptr;
   std::vector<DefaultConditionFilter *> condition_filters_;
 };
 

@@ -146,4 +146,5 @@ CompositeAggregate::~CompositeAggregate () {
         printf("<LCC> ~CompositeAggregate: delete a%d.\n", i);
         delete aggres_[i];
     }
+    aggres_.clear();
 }

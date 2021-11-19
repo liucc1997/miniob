@@ -16,7 +16,7 @@ See the Mulan PSL v2 for more details. */
 #include "storage/common/table.h"
 #include "common/log/log.h"
 
-SelectExeNode::SelectExeNode() : table_(nullptr), aggregations_(nullptr) {
+SelectExeNode::SelectExeNode() : table_(nullptr) {
 }
 
 SelectExeNode::~SelectExeNode() {
