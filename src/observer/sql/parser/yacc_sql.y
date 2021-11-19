@@ -426,24 +426,43 @@ aggregate:
     | MIN LBRACE ID RBRACE aggregate_list {
 		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMIN, $3);
 	}
+	|
+	MAX LBRACE STAR RBRACE aggregate_list {
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMAX, "*");
+	}
+    | MIN LBRACE STAR RBRACE aggregate_list {
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMIN, "*");
+	}
     | count_aggregate aggregate_list {
 	}
     | AVG LBRACE ID RBRACE aggregate_list {
 		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGAVG, $3);
 	}
+    | AVG LBRACE STAR RBRACE aggregate_list {
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGAVG, "*");
+	}	
     ;
 aggregate_list:
     /* empty */
     | COMMA MAX LBRACE ID RBRACE aggregate_list {
 		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMAX, $4);
 	}
+    | COMMA MAX LBRACE STAR RBRACE aggregate_list {
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMAX, "*");
+	}
     | COMMA MIN LBRACE ID RBRACE aggregate_list {
 		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMIN, $4);
+	}
+    | COMMA MIN LBRACE STAR RBRACE aggregate_list {
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMIN, "*");
 	}
     | COMMA count_aggregate aggregate_list {
 	}
     | COMMA AVG LBRACE ID RBRACE aggregate_list {
 		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGAVG, $4);
+	}
+    | COMMA AVG LBRACE STAR RBRACE aggregate_list {
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGAVG, "*");
 	}
     ;
 count_aggregate:
