@@ -8,7 +8,7 @@ Aggregate* Aggregate::aggregate_allocator(Table *table, AggregationType type, co
     const FieldMeta *field_meta = table->table_meta().field(attr_name);
     if (type == AGCOUNT) {
         if (field_meta == nullptr && 
-            strcmp(attr_name, "*") != 0 && strcmp(attr_name, "") != 0   //count(*) or count()
+            strcmp(attr_name, "*") != 0   //count(*) 
         ) {
             return nullptr;
         }
