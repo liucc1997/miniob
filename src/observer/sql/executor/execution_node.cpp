@@ -62,7 +62,7 @@ RC SelectExeNode::execute(TupleSet &tuple_set) {
     // if (rc != RC::SUCCESS) {
     //   return rc;
     // }
-    aggregations_->set_tuple(tuple_set);
+    // aggregations_->set_tuple(tuple_set);
     return rc;
   }
   tuple_set.set_schema(tuple_schema_);
