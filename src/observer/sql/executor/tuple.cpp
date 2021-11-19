@@ -316,7 +316,6 @@ void TupleRecordConverter::add_record(const char *record) {
   Tuple tuple;
   const TableMeta &table_meta = table_->table_meta();
   for (const TupleField &field : schema.fields()) {
-    printf("<LCC> add_record-TupleField: %s\n", field.to_string().c_str());
     const FieldMeta *field_meta = table_meta.field(field.field_name());
     assert(field_meta != nullptr);
     switch (field_meta->type()) {

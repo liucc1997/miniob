@@ -143,7 +143,6 @@ void CompositeAggregate::set_tuple(TupleSet &tuple_set) {
 
 CompositeAggregate::~CompositeAggregate () {
     for (int i = 0; i < aggres_.size(); i++) {
-        printf("<LCC> ~CompositeAggregate: delete a%d.\n", i);
         delete aggres_[i];
     }
     aggres_.clear();

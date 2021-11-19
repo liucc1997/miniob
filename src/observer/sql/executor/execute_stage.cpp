@@ -250,8 +250,6 @@ RC ExecuteStage::do_select(const char *db, Query *sql, SessionEvent *session_eve
   for (SelectExeNode *&node: select_nodes) {
     TupleSet tuple_set;
     rc = node->execute(tuple_set);
-    printf("<LCC> tuple_set.size() = %d tuple_set.get_schema().fields().size() = %d\n", \
-      tuple_set.size(), tuple_set.get_schema().fields().size());
     if (rc != RC::SUCCESS) {
       for (SelectExeNode *& tmp_node: select_nodes) {
         delete tmp_node;
