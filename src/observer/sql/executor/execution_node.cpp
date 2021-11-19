@@ -52,16 +52,16 @@ RC SelectExeNode::execute(TupleSet &tuple_set) {
   tuple_set.clear();
     // 区分聚合运算的情况
   if (aggregations_ && aggregations_->get_aggre_list().size() > 0) {
-    TupleSchema agg_schema;
-    for (Aggregate* a : aggregations_->get_aggre_list()) {
-       agg_schema.add(a->get_attr_type(), table_->name(), a->get_schema_attr());
-    }
-    tuple_set.set_schema(agg_schema);
+    // TupleSchema agg_schema;
+    // for (Aggregate* a : aggregations_->get_aggre_list()) {
+    //    agg_schema.add(a->get_attr_type(), table_->name(), a->get_schema_attr());
+    // }
+    // tuple_set.set_schema(agg_schema);
     // RC rc = table_->scan_record(trx_, &condition_filter, -1, (void *)aggregations_, Aggregate::record_reader);
     RC rc = RC::GENERIC_ERROR;
-    if (rc != RC::SUCCESS) {
-      return rc;
-    }
+    // if (rc != RC::SUCCESS) {
+    //   return rc;
+    // }
     aggregations_->set_tuple(tuple_set);
     return rc;
   }
