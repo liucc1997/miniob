@@ -260,10 +260,10 @@ void TupleSet::clear() {
 }
 
 void TupleSet::print(std::ostream &os, int multi_table) const {
-  if (schema_.fields().empty()) {
-    LOG_WARN("Got empty schema");
-    return;
-  }
+  // if (schema_.fields().empty()) {
+  //   LOG_WARN("Got empty schema");
+  //   return;
+  // }
 
   schema_.print(os, multi_table);
 
