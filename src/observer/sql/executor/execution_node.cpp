@@ -51,19 +51,20 @@ RC SelectExeNode::execute(TupleSet &tuple_set) {
   condition_filter.init((const ConditionFilter **)condition_filters_.data(), condition_filters_.size());
   tuple_set.clear();
     // 区分聚合运算的情况
-  if (aggregations_->get_aggre_list().size() > 0) {
+  if (aggregations_ && aggregations_->get_aggre_list().size() > 0) {
     // TupleSchema agg_schema;
     // for (Aggregate* a : aggregations_->get_aggre_list()) {
     //    agg_schema.add(a->get_attr_type(), table_->name(), a->get_schema_attr());
     // }
     // tuple_set.set_schema(agg_schema);
     // RC rc = table_->scan_record(trx_, &condition_filter, -1, (void *)aggregations_, Aggregate::record_reader);
-    RC rc = table_->scan_record(trx_, &condition_filter, -1, (void *)aggregations_, Aggregate::record_reader);
-    if (rc != RC::SUCCESS) {
-      return rc;
-    }
-    aggregations_->set_tuple(tuple_set);
-    return rc;
+
+    // RC rc = table_->scan_record(trx_, &condition_filter, -1, (void *)aggregations_, Aggregate::record_reader);
+    // if (rc != RC::SUCCESS) {
+    //   return rc;
+    // }
+    // aggregations_->set_tuple(tuple_set);
+    // return rc;
   }
   tuple_set.set_schema(tuple_schema_);
   TupleRecordConverter converter(table_, tuple_set);
