@@ -23,10 +23,10 @@ SelectExeNode::~SelectExeNode() {
   for (DefaultConditionFilter * &filter : condition_filters_) {
     delete filter;
   }
-  if (aggregations_) {
-    delete(aggregations_);
-  }
   condition_filters_.clear();
+  if (aggregations_) {
+    delete aggregations_;
+  }
 }
 
 RC
