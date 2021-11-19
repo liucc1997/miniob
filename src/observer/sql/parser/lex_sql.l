@@ -77,6 +77,7 @@ QUOTE            [\'\"]
 [Cc][Oo][Uu][Nn][Tt]                     RETURN_TOKEN(COUNT);
 [Ii][Nn][Ff][Ii][Ll][Ee]                 RETURN_TOKEN(INFILE);
 {ID}							                       yylval->string=strdup(yytext); RETURN_TOKEN(ID);
+\(\)|\([A-Za-z_\*]+[A-Za-z0-9_\*,]*\)                           yylval->string=strdup(yytext); RETURN_TOKEN(AGGR_PARA);
 "("								                       RETURN_TOKEN(LBRACE);
 ")"								                       RETURN_TOKEN(RBRACE);
 
