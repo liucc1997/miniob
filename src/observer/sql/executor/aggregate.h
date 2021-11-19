@@ -36,7 +36,7 @@ class CountAggregate : public Aggregate {
     int count_;
     public:
     CountAggregate(AggregationType type, const char* attr_name) : count_(0), Aggregate(type, attr_name) {}
-    void do_record(const char *record) {
+    virtual void do_record(const char *record) {
         count_ ++;
     }
     virtual const char* get_result_poniter() {
@@ -56,7 +56,7 @@ class MaxAggregate : public Aggregate {
         feild_offset_ = feild_offset;
         feild_type_ = feild_type;
     }
-    void do_record(const char *record);
+    virtual void do_record(const char *record);
     virtual const char* get_result_poniter() {
         return value_data_;
     }
@@ -72,7 +72,7 @@ class MinAggregate : public MaxAggregate {
     public:
     MinAggregate(AggregationType type, const char* attr_name, size_t feild_offset, AttrType feild_type) : 
         MaxAggregate(type, attr_name, feild_offset, feild_type) {}
-    void do_record(const char *record);
+    virtual void do_record(const char *record);
     virtual const char* get_schema_attr() { 
         snprintf(schema_attr_, 16, "min(%s)", attr_name_);
         return schema_attr_;
@@ -87,7 +87,7 @@ class AvgAggregate : public Aggregate {
         feild_offset_ = feild_offset;
         feild_type_ = feild_type;
     }
-    void do_record(const char *record);
+    virtual void do_record(const char *record);
     virtual const char* get_result_poniter() {
         return (char*)(&avg_);
     }
@@ -105,11 +105,11 @@ class CompositeAggregate : public Aggregate {
     void add_aggration(Aggregate* a) {
         aggres_.push_back(a);
     }
-    CompositeAggregate () : Aggregate(UNKNOW_AGTYPE, nullptr) {}
+    CompositeAggregate () : Aggregate(UNKNOW_AGTYPE, "composite") {}
     ~CompositeAggregate ();
     std::vector<Aggregate*>& get_aggre_list() { return aggres_; }
-    void do_record(const char *record);
-    virtual char* get_schema_attr() { return nullptr; }
+    virtual void do_record(const char *record);
+    virtual const char* get_schema_attr() { return attr_name_; }
     void set_tuple(TupleSet &tuple_set);
     private:
     std::vector<Aggregate*> aggres_;
