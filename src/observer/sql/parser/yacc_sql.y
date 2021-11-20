@@ -125,7 +125,10 @@ ParserContext *get_context(yyscan_t scanner)
 %token <string> ID
 %token <string> PATH
 %token <string> SSS
-%token <string> AGGR_PARA
+%token <string> AGGR_MAX
+%token <string> AGGR_MIN
+%token <string> AGGR_AVG
+%token <string> AGGR_COUNT
 %token <string> STAR
 %token <string> STRING_V
 //非终结符
@@ -421,48 +424,48 @@ attr_list:
   	  }
   	;
 aggregate:
-	MAX AGGR_PARA aggregate_list {
-		$2 = substr($2, 1, strlen($2) - 2);
-		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMAX, $2);
-		free($2);
+	AGGR_MAX aggregate_list {
+		$1 = substr($1, 4, strlen($1) - 2);
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMAX, $1);
+		free($1);
 	}
-    | MIN AGGR_PARA aggregate_list {
-		$2 = substr($2, 1, strlen($2) - 2);
-		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMIN, $2);
-		free($2);
+    | AGGR_MIN aggregate_list {
+		$1 = substr($1, 4, strlen($1) - 2);
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMIN, $1);
+		free($1);
 	}
-    | COUNT AGGR_PARA aggregate_list {
-		$2 = substr($2, 1, strlen($2) - 2);
-		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGCOUNT, $2);
-		free($2);
+    | AGGR_COUNT aggregate_list {
+		$1 = substr($1, 6, strlen($1) - 2);
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGCOUNT, $1);
+		free($1);
 	}
-    | AVG AGGR_PARA aggregate_list {
-		$2 = substr($2, 1, strlen($2) - 2);
-		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGAVG, $2);
-		free($2);
+    | AGGR_AVG aggregate_list {
+		$1 = substr($1, 4, strlen($1) - 2);
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGAVG, $1);
+		free($1);
 	}
     ;
 aggregate_list:
     /* empty */
-    | COMMA MAX AGGR_PARA aggregate_list {
-		$3 = substr($3, 1, strlen($3) - 2);
-		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMAX, $3);
-		free($3);
+    | COMMA AGGR_MAX aggregate_list {
+		$2 = substr($2, 4, strlen($2) - 2);
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMAX, $2);
+		free($2);
 	}
-    | COMMA MIN AGGR_PARA aggregate_list {
-		$3 = substr($3, 1, strlen($3) - 2);
-		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMIN, $3);
-		free($3);
+    | COMMA AGGR_MIN aggregate_list {
+		$2 = substr($2, 4, strlen($2) - 2);
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGMIN, $2);
+		free($2);
 	}
-    | COMMA COUNT AGGR_PARA aggregate_list {
-		$3 = substr($3, 1, strlen($3) - 2);
-		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGCOUNT, $3);
-		free($3);
+    | COMMA AGGR_COUNT aggregate_list {
+		$2 = substr($2, 6, strlen($2) - 2);
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGCOUNT, $2);
+		free($2);
 	}
-    | COMMA AVG AGGR_PARA aggregate_list {
-		$3 = substr($3, 1, strlen($3) - 2);
-		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGAVG, $3);
-		free($3);
+    | COMMA AGGR_AVG aggregate_list {
+		$2 = substr($2, 4, strlen($2) - 2);
+		selects_append_aggregation(&CONTEXT->ssql->sstr.selection, AGAVG, $2);
+		free($2);
 	}
     ;
 rel_list:
